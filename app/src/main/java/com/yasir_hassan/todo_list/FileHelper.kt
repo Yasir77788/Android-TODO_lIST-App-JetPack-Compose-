@@ -2,6 +2,7 @@ package com.yasir_hassan.todo_list
 
 import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import java.io.FileNotFoundException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
@@ -32,9 +33,15 @@ fun writeData(items: SnapshotStateList<String>, context: Context){
 fun readData(context: Context): SnapshotStateList<String>{
     // transfer the data to an array list
     var itemList: ArrayList<String>
-    val fis = context.openFileInput(FILE_NAME)
-    val ois = ObjectInputStream(fis)
-    itemList = ois.readObject() as ArrayList<String>  // cast data from object to string
+    try {
+        val fis = context.openFileInput(FILE_NAME)
+        val ois = ObjectInputStream(fis)
+        itemList = ois.readObject() as ArrayList<String>  // cast data from object to string
+    }catch (e: FileNotFoundException){
+        // create an empty item list
+        itemList = ArrayList()
+    }
+
 
     // Conver the itemLIst to SnapshotStateList to be returned by the function
     val items = SnapshotStateList<String>() // create SSSL

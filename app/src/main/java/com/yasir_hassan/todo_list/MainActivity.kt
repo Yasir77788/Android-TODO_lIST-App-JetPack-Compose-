@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontVariation.weight
@@ -81,6 +82,10 @@ fun MainPage(modifier: Modifier = Modifier) {
     val todoName = remember {
         mutableStateOf("")
     }
+
+    // to change the focus state of the textField, use FocusManager Interface
+    // Create an instance of the FocusManager interface
+    val focusManager = LocalFocusManager.current
 
     // create a list for the item function
     val itemList = readData(myContext) // read saved data from the local file and transfer to the itemList
@@ -129,6 +134,8 @@ fun MainPage(modifier: Modifier = Modifier) {
                         writeData(itemList, myContext)
                         // clear the textField
                         todoName.value = ""
+                        // clear the focus state of the textField
+                        focusManager.clearFocus()
                     }else{
                         //show toast message to the user
                         Toast.makeText(myContext, "Please, enter Todo", Toast.LENGTH_SHORT)
