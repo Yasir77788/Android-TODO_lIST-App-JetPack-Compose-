@@ -1,6 +1,7 @@
 package com.yasir_hassan.todo_list
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontVariation.weight
@@ -72,15 +74,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainPage(modifier: Modifier = Modifier) {
 
+    // create context to read data
+    val myContext = LocalContext.current
+
     // variable to observe the value of the textField when the value changes
     val todoName = remember {
         mutableStateOf("")
     }
 
     // create a list for the item function
-    val itemList = remember {
-        mutableStateListOf("Learn Kotlin", "Lean Compose")
-    }
+    val itemList = readData(myContext) // read saved data from the local file and transfer to the itemList
     // The main layout is a column
     Column(modifier = Modifier.fillMaxSize()) {
         // add a top row
@@ -117,7 +120,21 @@ fun MainPage(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(5.dp))
 
             Button(
-                onClick = {},
+                // adding data to the list
+                onClick = {
+                    // check if data entered in the text field
+                    if(todoName.value.isNotEmpty()){
+                        itemList.add(todoName.value)
+                        // write the entered data to the local file
+                        writeData(itemList, myContext)
+                        // clear the textField
+                        todoName.value = ""
+                    }else{
+                        //show toast message to the user
+                        Toast.makeText(myContext, "Please, enter Todo", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                },
                 modifier = Modifier
                     .weight(3F)
                     .height(60.dp),

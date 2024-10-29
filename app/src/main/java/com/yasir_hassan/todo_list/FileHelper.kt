@@ -13,7 +13,7 @@ const val FILE_NAME = "todolist.dat" // or txt
 // Snapshot, which is the result created by mutableStateListOf.
 // this class implements the same semantic as arrayList.
 // using FileOutputStream class for saving the data
-fun wrightData(items: SnapshotStateList<String>, context: Context){
+fun writeData(items: SnapshotStateList<String>, context: Context){
     // write data to file
     val fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE) // reached within the application
     val oos = ObjectOutputStream(fos) //
