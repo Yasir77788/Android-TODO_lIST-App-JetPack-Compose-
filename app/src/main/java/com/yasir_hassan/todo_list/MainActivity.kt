@@ -103,6 +103,8 @@ fun MainPage(modifier: Modifier = Modifier) {
 
     // The main layout is a column
     Column(modifier = Modifier.fillMaxSize()) {
+
+        Spacer(modifier = Modifier.padding(top = 15.dp))
         // add a top row
         Row(
             modifier = Modifier
