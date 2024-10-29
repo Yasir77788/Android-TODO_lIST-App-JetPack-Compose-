@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -87,8 +89,18 @@ fun MainPage(modifier: Modifier = Modifier) {
     // Create an instance of the FocusManager interface
     val focusManager = LocalFocusManager.current
 
+    // variable to observe the state of the dailog window
+    val deleteDialogStatus = remember {
+        mutableStateOf(false)
+    }
+
+    val clickedItemIndex = remember {
+        mutableStateOf(0)
+    }
+
     // create a list for the item function
     val itemList = readData(myContext) // read saved data from the local file and transfer to the itemList
+
     // The main layout is a column
     Column(modifier = Modifier.fillMaxSize()) {
         // add a top row
@@ -199,7 +211,10 @@ fun MainPage(modifier: Modifier = Modifier) {
                                         tint = Color.White
                                     )
                                 }
-                                IconButton(onClick = {}) {
+                                IconButton(onClick = {
+                                    deleteDialogStatus.value = true
+                                    clickedItemIndex.value = index
+                                }) {
                                     Icon(
                                         Icons.Filled.Delete, contentDescription = "delete",
                                         tint = Color.White
@@ -212,6 +227,42 @@ fun MainPage(modifier: Modifier = Modifier) {
             )
 
 
+        }
+
+        // create a dialog message
+        if(deleteDialogStatus.value){
+            // call the AlertDialog composable function
+            AlertDialog(onDismissRequest = {deleteDialogStatus.value = false},
+                title = {
+                    Text(text = "Delete")
+                },
+                text = {
+                    Text(text = "Do you want to delete this item from the list?")
+                },
+                // add the confirm button
+                confirmButton = {
+                    TextButton(onClick = {
+                        // remove the selected item from the list
+                        itemList.removeAt(clickedItemIndex.value)
+                        // write the last version of the list to the file
+                        writeData(itemList, myContext)
+                        // close the dialog after the use click yes button
+                        deleteDialogStatus.value = false
+                        // show toast message to the user
+                        Toast.makeText(myContext, "Item is removed from the list.", Toast.LENGTH_SHORT)
+                            .show()
+                    }) {
+                        // specify the text of the confirm button
+                        Text(text = "Yes")
+                    }
+                },
+                // add the dismiss button parameter
+                dismissButton = {
+                    TextButton(onClick = {deleteDialogStatus.value = false}) {
+                        Text(text = "No")
+                    }
+                }
+            )
         }
 
     }
