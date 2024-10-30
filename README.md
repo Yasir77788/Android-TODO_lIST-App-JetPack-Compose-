@@ -10,4 +10,4 @@ In the lazy-column, the list items will be placed.
 Each item is placed in a card design.
 In the card, there will be two rows: one holds the entered text and the other holds icons for edit and delete.
 
-![image alt](https://github.com/Yasir77788/Android-ToDo_List-App-JetPack-Compose-/blob/84055b148fb161c30ea91d939d0e2a3aeab4465b/settings.gradle.kts)
+![image alt](mg111.png)
