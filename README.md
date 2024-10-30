@@ -11,3 +11,10 @@ Each item is placed in a card design.
 In the card, there will be two rows: one holds the entered text and the other holds icons for edit and delete.
 
 ![image alt](mg111.png)
+![image alt](mg1.png)
+![image alt](mg2.png)
+![image alt](mg3.png)
+![image alt](mg4.png)
+![image alt](mg5.png)
+![image alt](mg6.png)
+
