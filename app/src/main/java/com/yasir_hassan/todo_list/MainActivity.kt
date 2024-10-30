@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -98,8 +99,24 @@ fun MainPage(modifier: Modifier = Modifier) {
         mutableStateOf(0)
     }
 
+    // variable for the dialog window
+    val updateDialogStatus = remember {
+        mutableStateOf(false)
+    }
+
+    // variable for the textField
+    val clickedItem = remember {
+        mutableStateOf("")
+    }
+
+    // variable to control the dialog status
+    val textDialogStatus = remember {
+        mutableStateOf(false)
+    }
+
     // create a list for the item function
-    val itemList = readData(myContext) // read saved data from the local file and transfer to the itemList
+    val itemList =
+        readData(myContext) // read saved data from the local file and transfer to the itemList
 
     // The main layout is a column
     Column(modifier = Modifier.fillMaxSize()) {
@@ -142,7 +159,7 @@ fun MainPage(modifier: Modifier = Modifier) {
                 // adding data to the list
                 onClick = {
                     // check if data entered in the text field
-                    if(todoName.value.isNotEmpty()){
+                    if (todoName.value.isNotEmpty()) {
                         itemList.add(todoName.value)
                         // write the entered data to the local file
                         writeData(itemList, myContext)
@@ -150,7 +167,7 @@ fun MainPage(modifier: Modifier = Modifier) {
                         todoName.value = ""
                         // clear the focus state of the textField
                         focusManager.clearFocus()
-                    }else{
+                    } else {
                         //show toast message to the user
                         Toast.makeText(myContext, "Please, enter Todo", Toast.LENGTH_SHORT)
                             .show()
@@ -202,12 +219,20 @@ fun MainPage(modifier: Modifier = Modifier) {
                             Text(
                                 text = item, color = Color.White, fontSize = 18.sp, maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.width(300.dp)
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .clickable { // add a clickable feature to the text
+                                        clickedItem.value = item
+                                        textDialogStatus.value = true
+                                    }
                             )
                             // create a row for the icon
                             Row() {
                                 // add an icon button
-                                IconButton(onClick = {}) {
+                                IconButton(onClick = {
+                                    updateDialogStatus.value = true
+                                    clickedItemIndex.value = index
+                                }) {
                                     Icon(
                                         Icons.Filled.Edit, contentDescription = "edit",
                                         tint = Color.White
@@ -216,6 +241,7 @@ fun MainPage(modifier: Modifier = Modifier) {
                                 IconButton(onClick = {
                                     deleteDialogStatus.value = true
                                     clickedItemIndex.value = index
+                                    clickedItem.value = item
                                 }) {
                                     Icon(
                                         Icons.Filled.Delete, contentDescription = "delete",
@@ -231,10 +257,51 @@ fun MainPage(modifier: Modifier = Modifier) {
 
         }
 
-        // create a dialog message
-        if(deleteDialogStatus.value){
+        // create a delete dialog message
+        if (updateDialogStatus.value) {
             // call the AlertDialog composable function
-            AlertDialog(onDismissRequest = {deleteDialogStatus.value = false},
+            AlertDialog(onDismissRequest = { updateDialogStatus.value = false },
+                title = {
+                    Text(text = "Update")
+                },
+                text = {
+                    TextField(
+                        value = clickedItem.value, onValueChange = { clickedItem.value = it }
+                    )
+                },
+                // add the confirm button
+                // update the selected item in the scope of the selected button
+                confirmButton = {
+                    TextButton(onClick = {
+                        // update the item in the index
+                        itemList[clickedItemIndex.value] = clickedItem.value
+
+                        // write the last version of the list to the file
+                        writeData(itemList, myContext)
+
+                        // close the dialog window
+                        updateDialogStatus.value = false
+                        // show toast message to the user
+                        Toast.makeText(myContext, "Item is updated.", Toast.LENGTH_SHORT)
+                            .show()
+                    }) {
+                        // specify the text of the confirm button
+                        Text(text = "Yes")
+                    }
+                },
+                // add the dismiss button parameter
+                dismissButton = {
+                    TextButton(onClick = { updateDialogStatus.value = false }) {
+                        Text(text = "No")
+                    }
+                }
+            )
+        }
+
+        // create an update dialog message
+        if (deleteDialogStatus.value) {
+            // call the AlertDialog composable function
+            AlertDialog(onDismissRequest = { deleteDialogStatus.value = false },
                 title = {
                     Text(text = "Delete")
                 },
@@ -251,7 +318,11 @@ fun MainPage(modifier: Modifier = Modifier) {
                         // close the dialog after the use click yes button
                         deleteDialogStatus.value = false
                         // show toast message to the user
-                        Toast.makeText(myContext, "Item is removed from the list.", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            myContext,
+                            "Item is removed from the list.",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }) {
                         // specify the text of the confirm button
@@ -260,12 +331,39 @@ fun MainPage(modifier: Modifier = Modifier) {
                 },
                 // add the dismiss button parameter
                 dismissButton = {
-                    TextButton(onClick = {deleteDialogStatus.value = false}) {
+                    TextButton(onClick = { deleteDialogStatus.value = false }) {
                         Text(text = "No")
                     }
                 }
             )
         }
+
+        // create an alert dialog for the entries exceeding two lines
+        if (textDialogStatus.value) {
+            // call the AlertDialog composable function
+            AlertDialog(onDismissRequest = { textDialogStatus.value = false },
+                title = {
+                    Text(text = "ToDo Item")
+                },
+                text = {
+                    Text(text = clickedItem.value)
+                },
+                // add the confirm button
+                confirmButton = {
+                    TextButton(onClick = {
+
+                        // close the dialog after the user click OK button
+                        textDialogStatus.value = false
+
+                    }) {
+                        // specify the text of the confirm button
+                        Text(text = "OK")
+                    }
+                }
+            )
+        }
+
+
 
     }
 }
