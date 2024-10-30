@@ -362,9 +362,6 @@ fun MainPage(modifier: Modifier = Modifier) {
                 }
             )
         }
-
-
-
     }
 }
 
